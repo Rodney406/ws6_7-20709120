@@ -21,5 +21,7 @@ public:
 private:
     Ui::MainWindow *ui;
     QStandardItemModel *model = nullptr;
+private slots:
+    void on_actionOpen_File_triggered();
 };
 #endif // MAINWINDOW_H

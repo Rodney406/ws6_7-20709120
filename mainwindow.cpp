@@ -6,6 +6,7 @@
 #include <QMenu>
 #include <QBrush>
 #include <QColor>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -62,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
 
                     EditItemDialog dlg(this);
 
-                    // 先把当前值放进 dialog
+                    // 把当前值放进 dialog
                     dlg.setName(item->text());
 
                     bool visible = item->data(Qt::UserRole + 1).toBool();
@@ -78,7 +79,6 @@ MainWindow::MainWindow(QWidget *parent)
                     if (dlg.exec() == QDialog::Accepted)
                     {
                         item->setText(dlg.getName());
-
                         item->setData(dlg.getVisibleValue(), Qt::UserRole + 1);
 
                         QColor newColour(dlg.getR(), dlg.getG(), dlg.getB());
@@ -94,4 +94,16 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::on_actionOpen_File_triggered()
+{
+    QString fileName = QFileDialog::getOpenFileName(
+        this,
+        tr("Open File"),
+        "C:\\",
+        tr("All Files (*.*)")
+        );
+
+    statusBar()->showMessage(fileName, 3000);
 }
