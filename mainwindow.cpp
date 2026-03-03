@@ -7,6 +7,7 @@
 #include <QBrush>
 #include <QColor>
 #include <QFileDialog>
+#include <QFileInfo>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -63,7 +64,6 @@ MainWindow::MainWindow(QWidget *parent)
 
                     EditItemDialog dlg(this);
 
-                    // 把当前值放进 dialog
                     dlg.setName(item->text());
 
                     bool visible = item->data(Qt::UserRole + 1).toBool();
@@ -75,7 +75,6 @@ MainWindow::MainWindow(QWidget *parent)
 
                     dlg.setColour(colour.red(), colour.green(), colour.blue());
 
-                    // 点 OK 后写回
                     if (dlg.exec() == QDialog::Accepted)
                     {
                         item->setText(dlg.getName());
@@ -98,12 +97,29 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionOpen_File_triggered()
 {
-    QString fileName = QFileDialog::getOpenFileName(
+    QModelIndex index = ui->treeView->currentIndex();
+    if (!index.isValid())
+    {
+        statusBar()->showMessage("Please select an item first", 3000);
+        return;
+    }
+
+    QString filePath = QFileDialog::getOpenFileName(
         this,
         tr("Open File"),
         "C:\\",
         tr("All Files (*.*)")
         );
 
-    statusBar()->showMessage(fileName, 3000);
+    if (filePath.isEmpty())
+        return;
+
+    QStandardItem *item = model->itemFromIndex(index);
+    if (!item)
+        return;
+
+    QFileInfo fileInfo(filePath);
+    item->setText(fileInfo.fileName());
+
+    statusBar()->showMessage(filePath, 3000);
 }
