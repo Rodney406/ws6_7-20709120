@@ -21,12 +21,12 @@ MainWindow::MainWindow(QWidget *parent)
     auto *root = model->invisibleRootItem();
 
     auto *top1 = new QStandardItem("TopLevel 0");
-    top1->appendRow(new QStandardItem("Child 0,0"));
-    top1->appendRow(new QStandardItem("Child 0,1"));
+    top1->appendRow(new QStandardItem("Item 0,0"));
+    top1->appendRow(new QStandardItem("Item 0,1"));
     root->appendRow(top1);
 
     auto *top2 = new QStandardItem("TopLevel 1");
-    top2->appendRow(new QStandardItem("Child 1,0"));
+    top2->appendRow(new QStandardItem("Item 1,0"));
     root->appendRow(top2);
 
     ui->treeView->setModel(model);
