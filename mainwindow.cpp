@@ -4,6 +4,8 @@
 
 #include <QStandardItemModel>
 #include <QMenu>
+#include <QBrush>
+#include <QColor>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -11,7 +13,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Tree model
     model = new QStandardItemModel(this);
     model->setHorizontalHeaderLabels(QStringList() << "Parts");
 
@@ -29,7 +30,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeView->setModel(model);
     ui->treeView->expandAll();
 
-    // Buttons + status bar
     connect(ui->addButton, &QPushButton::clicked, this, [this]() {
         statusBar()->showMessage("Add clicked", 2000);
     });
@@ -38,7 +38,6 @@ MainWindow::MainWindow(QWidget *parent)
         statusBar()->showMessage("Remove clicked", 2000);
     });
 
-    // Context menu
     ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 
     connect(ui->treeView, &QWidget::customContextMenuRequested,
@@ -57,8 +56,37 @@ MainWindow::MainWindow(QWidget *parent)
 
                 if (selected == editAction)
                 {
+                    QStandardItem *item = model->itemFromIndex(index);
+                    if (!item)
+                        return;
+
                     EditItemDialog dlg(this);
-                    dlg.exec();
+
+                    // 先把当前值放进 dialog
+                    dlg.setName(item->text());
+
+                    bool visible = item->data(Qt::UserRole + 1).toBool();
+                    dlg.setVisibleValue(visible);
+
+                    QColor colour = item->data(Qt::UserRole + 2).value<QColor>();
+                    if (!colour.isValid())
+                        colour = Qt::black;
+
+                    dlg.setColour(colour.red(), colour.green(), colour.blue());
+
+                    // 点 OK 后写回
+                    if (dlg.exec() == QDialog::Accepted)
+                    {
+                        item->setText(dlg.getName());
+
+                        item->setData(dlg.getVisibleValue(), Qt::UserRole + 1);
+
+                        QColor newColour(dlg.getR(), dlg.getG(), dlg.getB());
+                        item->setData(newColour, Qt::UserRole + 2);
+                        item->setForeground(QBrush(newColour));
+
+                        statusBar()->showMessage("Item updated", 2000);
+                    }
                 }
             });
 }
